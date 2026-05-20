@@ -1,0 +1,256 @@
+# ------------------------------------------------------------------------------
+# SaaS Microservices Platform — .gitignore
+# Targets: .NET 10 / C# 14 / ASP.NET Core / EF Core / Docker / K8s
+# ------------------------------------------------------------------------------
+
+# ==============================================================================
+# BUILD OUTPUT
+# ==============================================================================
+
+# Default .NET build output directories
+bin/
+obj/
+artifacts/
+out/
+publish/
+
+# Native compilation / AOT / single-file publish output
+*.native/
+*.publish/
+
+# Generated runtime configuration
+*.runtimeconfig.json
+testhost*.dll
+testhost*.exe
+
+# ==============================================================================
+# VISUAL STUDIO
+# ==============================================================================
+
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.cachefile
+
+# Visual Studio profiler / diagnostic sessions
+*.psess
+*.vsp
+*.vspx
+*.sap
+
+# Visual Studio code coverage results
+*.coverage
+*.coveragexml
+
+# Visual Studio publish profiles (may contain secrets)
+**/Properties/PublishProfiles/
+
+# ==============================================================================
+# VISUAL STUDIO CODE
+# ==============================================================================
+
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# ==============================================================================
+# JETBRAINS RIDER / REHARPER
+# ==============================================================================
+
+.idea/
+*.sln.iml
+
+# ReSharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# Rider / ReSharper caches
+*.sln.DotSettings
+resharper.xml
+
+# ==============================================================================
+# NUGET
+# ==============================================================================
+
+*.nupkg
+*.snupkg
+packages/
+project.lock.json
+project.fragment.lock.json
+
+# Central Package Management lock files (optional — commit if you want reproducible builds)
+# packages.lock.json
+
+# NuGet v3 cache
+.nuget/
+
+# ==============================================================================
+# .NET 10 / ASP.NET CORE / EF CORE
+# ==============================================================================
+
+# ASP.NET temporary files
+[Tt]emp/
+[Aa]pp_[Dd]ata/
+
+# Compiled EF Core models (optional — commit if checked into source)
+**/CompiledModels/
+
+# EF Core migration designer snapshots (regenerated on build)
+# Comment out if you prefer to commit these for team consistency
+**/Migrations/*.Designer.cs
+
+# Scaffolding generated files
+ScaffoldingReadMe.txt
+
+# IIS / IIS Express
+wwwroot/lib/
+wwwroot/dist/
+wwwroot/node_modules/
+
+# ==============================================================================
+# TESTS & COVERAGE
+# ==============================================================================
+
+TestResults/
+*.trx
+
+# Coverlet / dotCover / OpenCover / ReportGenerator
+coverage/
+coverage.*
+*.opencover.xml
+*.cobertura.xml
+*.coverlet.*
+
+# BenchmarkDotNet
+BenchmarkDotNet.Artifacts/
+
+# ==============================================================================
+# LOGS & TEMPORARY FILES
+# ==============================================================================
+
+*.log
+*.tlog
+logs/
+*.tmp
+*.temp
+
+# ==============================================================================
+# SECRETS & ENVIRONMENT
+# ==============================================================================
+
+# Never commit real environment files or secrets
+.env
+.env.*
+!.env.example
+
+# .NET user secrets directory
+%USERPROFILE%/.aspnet/
+%APPDATA%/Microsoft/UserSecrets/
+
+# Azure / AWS / GCP credentials
+*.publishsettings
+*.pubxml
+
+# ==============================================================================
+# DOCKER
+# ==============================================================================
+
+# Docker compose override is environment-specific — never commit overrides
+docker-compose.override.yml
+docker-compose.*.yml
+!docker-compose.yml
+
+# Docker build cache
+.docker/
+
+# ==============================================================================
+# KUBERNETES / HELM
+# ==============================================================================
+
+# Rendered Kustomize outputs or environment-specific patches
+kustomize-output.yaml
+*.kustomize.yaml
+
+# Helm chart packaged releases
+*.tgz
+
+# ==============================================================================
+# OPERATING SYSTEM FILES
+# ==============================================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+
+# Linux
+*~
+.nfs*
+
+# ==============================================================================
+# VERSION CONTROL METADATA
+# ==============================================================================
+
+# Exclude global git ignore from repo-level
+!.gitignore
+
+# ==============================================================================
+# MISC
+# ==============================================================================
+
+# Node / npm (if any frontend build tooling in the repo)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Paket dependency manager
+.paket/paket.exe
+paket-files/
+
+# FAKE build scripts
+.fake/
+
+# Cake
+[Cc]ake/
+
+# Ionide (F#)
+.ionide/
+
+# Local History for Visual Studio Code
+.history/
+
+# Backup files
+*.bak
+*.swp
+*.swo
+*~
+
+# ==============================================================================
+# PROJECT-SPECIFIC (SaaS Platform)
+# ==============================================================================
+
+# Local infrastructure data volumes (Docker)
+volumes/
+
+# Local script outputs
+scripts/*.sql.bak
+
+# Seq local data
+deploy/seq-data/

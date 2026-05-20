@@ -1,0 +1,184 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: saas-platform-dev
+
+resources:
+  - ../../base/shared
+  - ../../base/gateway
+  - ../../base/identity
+  - ../../base/tenant
+  - ../../base/order
+  - ../../base/payment
+  - ../../base/inventory
+  - ../../base/customer
+  - ../../base/notification
+
+images:
+  - name: saas-platform/gateway
+    newName: saas-platform/gateway
+    newTag: dev-latest
+  - name: saas-platform/identity
+    newName: saas-platform/identity
+    newTag: dev-latest
+  - name: saas-platform/tenant
+    newName: saas-platform/tenant
+    newTag: dev-latest
+  - name: saas-platform/order
+    newName: saas-platform/order
+    newTag: dev-latest
+  - name: saas-platform/payment
+    newName: saas-platform/payment
+    newTag: dev-latest
+  - name: saas-platform/inventory
+    newName: saas-platform/inventory
+    newTag: dev-latest
+  - name: saas-platform/customer
+    newName: saas-platform/customer
+    newTag: dev-latest
+  - name: saas-platform/notification
+    newName: saas-platform/notification
+    newTag: dev-latest
+
+configMapGenerator:
+  - name: saas-platform-config
+    behavior: merge
+    literals:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - Serilog__MinimumLevel__Default=Debug
+      - Serilog__MinimumLevel__Override__Microsoft=Information
+
+patches:
+  - target:
+      kind: Deployment
+      name: gateway
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+      - op: replace
+        path: /spec/template/spec/containers/0/imagePullPolicy
+        value: Never
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits
+        value:
+          cpu: 200m
+          memory: 128Mi
+  - target:
+      kind: Deployment
+      name: identity
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+      - op: replace
+        path: /spec/template/spec/containers/0/imagePullPolicy
+        value: Never
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits
+        value:
+          cpu: 200m
+          memory: 128Mi
+  - target:
+      kind: Deployment
+      name: tenant
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+      - op: replace
+        path: /spec/template/spec/containers/0/imagePullPolicy
+        value: Never
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits
+        value:
+          cpu: 200m
+          memory: 128Mi
+  - target:
+      kind: Deployment
+      name: order
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+      - op: replace
+        path: /spec/template/spec/containers/0/imagePullPolicy
+        value: Never
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits
+        value:
+          cpu: 200m
+          memory: 128Mi
+  - target:
+      kind: Deployment
+      name: payment
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+      - op: replace
+        path: /spec/template/spec/containers/0/imagePullPolicy
+        value: Never
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits
+        value:
+          cpu: 200m
+          memory: 128Mi
+  - target:
+      kind: Deployment
+      name: inventory
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+      - op: replace
+        path: /spec/template/spec/containers/0/imagePullPolicy
+        value: Never
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits
+        value:
+          cpu: 200m
+          memory: 128Mi
+  - target:
+      kind: Deployment
+      name: customer
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+      - op: replace
+        path: /spec/template/spec/containers/0/imagePullPolicy
+        value: Never
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits
+        value:
+          cpu: 200m
+          memory: 128Mi
+  - target:
+      kind: Deployment
+      name: notification
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+      - op: replace
+        path: /spec/template/spec/containers/0/imagePullPolicy
+        value: Never
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits
+        value:
+          cpu: 200m
+          memory: 128Mi
+  - target:
+      kind: Ingress
+      name: gateway-ingress
+    patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: api.dev.local
+      - op: replace
+        path: /spec/tls/0/hosts/0
+        value: api.dev.local
+      - op: replace
+        path: /spec/tls/0/secretName
+        value: dev-gateway-tls

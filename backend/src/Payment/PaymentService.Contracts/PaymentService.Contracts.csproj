@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>PaymentService.Contracts</AssemblyName>
+    <RootNamespace>PaymentService.Contracts</RootNamespace>
+  </PropertyGroup>
+</Project>

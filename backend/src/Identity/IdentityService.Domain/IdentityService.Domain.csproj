@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>IdentityService.Domain</AssemblyName>
+    <RootNamespace>IdentityService.Domain</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Shared\SaaSCommon.Domain\SaaSCommon.Domain.csproj" />
+  </ItemGroup>
+</Project>

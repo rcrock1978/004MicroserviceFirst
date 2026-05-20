@@ -1,0 +1,34 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "logLevel": "INFO",
+  "default_agent": "service-builder",
+  "instructions": [
+    "AGENTS.md"
+  ],
+  "skills": {
+    "paths": [
+      ".opencode/skills"
+    ]
+  },
+  "agent": {
+    "service-builder": {
+      "description": "Builds and refactors SaaS backend microservices following the platform architecture.",
+      "mode": "primary",
+      "model": "alibaba/qwen-3.6-plus"
+    },
+    "infra-builder": {
+      "description": "Creates infrastructure, deployment manifests, CI/CD, and operational configurations.",
+      "mode": "subagent",
+      "model": "minimax/m2.7"
+    },
+    "test-engineer": {
+      "description": "Writes and reviews tests: unit, integration, contract, and smoke tests.",
+      "mode": "subagent",
+      "model": "xiaomi/mimo-v2.5-pro"
+    }
+  },
+  "permission": {
+    "edit": "allow",
+    "bash": "allow"
+  }
+}

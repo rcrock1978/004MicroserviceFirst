@@ -1,0 +1,338 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: saas-platform-prod
+
+resources:
+  - ../../base/shared
+  - ../../base/gateway
+  - ../../base/identity
+  - ../../base/tenant
+  - ../../base/order
+  - ../../base/payment
+  - ../../base/inventory
+  - ../../base/customer
+  - ../../base/notification
+
+images:
+  - name: saas-platform/gateway
+    newName: ghcr.io/saas-platform/gateway
+    newTag: v1.0.0
+  - name: saas-platform/identity
+    newName: ghcr.io/saas-platform/identity
+    newTag: v1.0.0
+  - name: saas-platform/tenant
+    newName: ghcr.io/saas-platform/tenant
+    newTag: v1.0.0
+  - name: saas-platform/order
+    newName: ghcr.io/saas-platform/order
+    newTag: v1.0.0
+  - name: saas-platform/payment
+    newName: ghcr.io/saas-platform/payment
+    newTag: v1.0.0
+  - name: saas-platform/inventory
+    newName: ghcr.io/saas-platform/inventory
+    newTag: v1.0.0
+  - name: saas-platform/customer
+    newName: ghcr.io/saas-platform/customer
+    newTag: v1.0.0
+  - name: saas-platform/notification
+    newName: ghcr.io/saas-platform/notification
+    newTag: v1.0.0
+
+configMapGenerator:
+  - name: saas-platform-config
+    behavior: merge
+    literals:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - Serilog__MinimumLevel__Default=Information
+      - Serilog__MinimumLevel__Override__Microsoft=Warning
+      - DOTNET_gcServer=1
+      - DOTNET_gcConcurrent=1
+
+patches:
+  - target:
+      kind: Deployment
+      name: gateway
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 3
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests
+        value:
+          cpu: 500m
+          memory: 512Mi
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits
+        value:
+          cpu: 2000m
+          memory: 1Gi
+  - target:
+      kind: Deployment
+      name: identity
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 3
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests
+        value:
+          cpu: 500m
+          memory: 512Mi
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits
+        value:
+          cpu: 2000m
+          memory: 1Gi
+  - target:
+      kind: Deployment
+      name: tenant
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 3
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests
+        value:
+          cpu: 500m
+          memory: 512Mi
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits
+        value:
+          cpu: 2000m
+          memory: 1Gi
+  - target:
+      kind: Deployment
+      name: order
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 3
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests
+        value:
+          cpu: 500m
+          memory: 512Mi
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits
+        value:
+          cpu: 2000m
+          memory: 1Gi
+  - target:
+      kind: Deployment
+      name: payment
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 3
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests
+        value:
+          cpu: 500m
+          memory: 512Mi
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits
+        value:
+          cpu: 2000m
+          memory: 1Gi
+  - target:
+      kind: Deployment
+      name: inventory
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 3
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests
+        value:
+          cpu: 500m
+          memory: 512Mi
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits
+        value:
+          cpu: 2000m
+          memory: 1Gi
+  - target:
+      kind: Deployment
+      name: customer
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 3
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests
+        value:
+          cpu: 500m
+          memory: 512Mi
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits
+        value:
+          cpu: 2000m
+          memory: 1Gi
+  - target:
+      kind: Deployment
+      name: notification
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 3
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests
+        value:
+          cpu: 500m
+          memory: 512Mi
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits
+        value:
+          cpu: 2000m
+          memory: 1Gi
+  - target:
+      kind: HorizontalPodAutoscaler
+      name: gateway
+    patch: |-
+      - op: replace
+        path: /spec/minReplicas
+        value: 3
+      - op: replace
+        path: /spec/maxReplicas
+        value: 20
+  - target:
+      kind: HorizontalPodAutoscaler
+      name: identity
+    patch: |-
+      - op: replace
+        path: /spec/minReplicas
+        value: 3
+      - op: replace
+        path: /spec/maxReplicas
+        value: 20
+  - target:
+      kind: HorizontalPodAutoscaler
+      name: tenant
+    patch: |-
+      - op: replace
+        path: /spec/minReplicas
+        value: 3
+      - op: replace
+        path: /spec/maxReplicas
+        value: 20
+  - target:
+      kind: HorizontalPodAutoscaler
+      name: order
+    patch: |-
+      - op: replace
+        path: /spec/minReplicas
+        value: 3
+      - op: replace
+        path: /spec/maxReplicas
+        value: 20
+  - target:
+      kind: HorizontalPodAutoscaler
+      name: payment
+    patch: |-
+      - op: replace
+        path: /spec/minReplicas
+        value: 3
+      - op: replace
+        path: /spec/maxReplicas
+        value: 20
+  - target:
+      kind: HorizontalPodAutoscaler
+      name: inventory
+    patch: |-
+      - op: replace
+        path: /spec/minReplicas
+        value: 3
+      - op: replace
+        path: /spec/maxReplicas
+        value: 20
+  - target:
+      kind: HorizontalPodAutoscaler
+      name: customer
+    patch: |-
+      - op: replace
+        path: /spec/minReplicas
+        value: 3
+      - op: replace
+        path: /spec/maxReplicas
+        value: 20
+  - target:
+      kind: HorizontalPodAutoscaler
+      name: notification
+    patch: |-
+      - op: replace
+        path: /spec/minReplicas
+        value: 3
+      - op: replace
+        path: /spec/maxReplicas
+        value: 20
+  - target:
+      kind: Ingress
+      name: gateway-ingress
+    patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: api.example.com
+      - op: replace
+        path: /spec/tls/0/hosts/0
+        value: api.example.com
+      - op: replace
+        path: /spec/tls/0/secretName
+        value: prod-gateway-tls
+  - target:
+      kind: PodDisruptionBudget
+      name: gateway
+    patch: |-
+      - op: replace
+        path: /spec/minAvailable
+        value: 2
+  - target:
+      kind: PodDisruptionBudget
+      name: identity
+    patch: |-
+      - op: replace
+        path: /spec/minAvailable
+        value: 2
+  - target:
+      kind: PodDisruptionBudget
+      name: tenant
+    patch: |-
+      - op: replace
+        path: /spec/minAvailable
+        value: 2
+  - target:
+      kind: PodDisruptionBudget
+      name: order
+    patch: |-
+      - op: replace
+        path: /spec/minAvailable
+        value: 2
+  - target:
+      kind: PodDisruptionBudget
+      name: payment
+    patch: |-
+      - op: replace
+        path: /spec/minAvailable
+        value: 2
+  - target:
+      kind: PodDisruptionBudget
+      name: inventory
+    patch: |-
+      - op: replace
+        path: /spec/minAvailable
+        value: 2
+  - target:
+      kind: PodDisruptionBudget
+      name: customer
+    patch: |-
+      - op: replace
+        path: /spec/minAvailable
+        value: 2
+  - target:
+      kind: PodDisruptionBudget
+      name: notification
+    patch: |-
+      - op: replace
+        path: /spec/minAvailable
+        value: 2

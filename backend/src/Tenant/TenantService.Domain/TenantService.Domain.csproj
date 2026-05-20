@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>TenantService.Domain</AssemblyName>
+    <RootNamespace>TenantService.Domain</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Shared\SaaSCommon.Domain\SaaSCommon.Domain.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>OrderService.Domain</AssemblyName>
+    <RootNamespace>OrderService.Domain</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Shared\SaaSCommon.Domain\SaaSCommon.Domain.csproj" />
+  </ItemGroup>
+</Project>

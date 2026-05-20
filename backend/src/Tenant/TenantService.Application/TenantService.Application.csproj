@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>TenantService.Application</AssemblyName>
+    <RootNamespace>TenantService.Application</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" />
+    <PackageReference Include="FluentValidation" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Shared\SaaSCommon.Application\SaaSCommon.Application.csproj" />
+    <ProjectReference Include="..\TenantService.Domain\TenantService.Domain.csproj" />
+    <ProjectReference Include="..\TenantService.Contracts\TenantService.Contracts.csproj" />
+  </ItemGroup>
+</Project>

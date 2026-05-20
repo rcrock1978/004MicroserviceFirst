@@ -1,0 +1,394 @@
+nameOverride: "saas-platform"
+fullnameOverride: "saas-platform"
+
+replicaCount: 1
+
+image:
+  registry: ghcr.io
+  repository: saas-platform
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+
+serviceAccount:
+  create: true
+  automountToken: false
+  annotations: {}
+
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "8080"
+  prometheus.io/path: "/metrics"
+
+podSecurityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    cert-manager.io/cluster-issuer: "letsencrypt"
+  hosts:
+    - host: api.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: gateway
+              port:
+                number: 8080
+  tls:
+    - secretName: gateway-tls
+      hosts:
+        - api.example.com
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+
+hpa:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+pdb:
+  enabled: true
+  minAvailable: 1
+
+networkPolicy:
+  enabled: true
+  defaultDeny: true
+  allowMesh: true
+
+probes:
+  liveness:
+    path: /health/live
+    initialDelaySeconds: 10
+    periodSeconds: 30
+    timeoutSeconds: 5
+    failureThreshold: 3
+  readiness:
+    path: /health/ready
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  startup:
+    path: /health/startup
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 30
+
+global:
+  namespace: saas-platform
+  environment: Production
+  database:
+    enabled: true
+  otel:
+    endpoint: "http://otel-collector.monitoring.svc.cluster.local:4317"
+    protocol: "grpc"
+  messaging:
+    transport: "RabbitMQ"
+    host: "rabbitmq"
+    port: "5672"
+  redis:
+    host: "redis"
+    port: "6379"
+
+services:
+  gateway:
+    enabled: true
+    replicaCount: 1
+    image:
+      repository: saas-platform/gateway
+    service:
+      port: 8080
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+    env:
+      - name: Gateway__Jwt__Authority
+        valueFrom:
+          secretKeyRef:
+            name: gateway-secrets
+            key: jwt-authority
+      - name: Gateway__Jwt__Audience
+        valueFrom:
+          secretKeyRef:
+            name: gateway-secrets
+            key: jwt-audience
+    secrets:
+      - name: gateway-secrets
+        keys:
+          - jwt-authority
+          - jwt-audience
+    migration:
+      enabled: false
+
+  identity:
+    enabled: true
+    replicaCount: 1
+    image:
+      repository: saas-platform/identity
+    service:
+      port: 8080
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+    env:
+      - name: ConnectionStrings__DefaultConnection
+        valueFrom:
+          secretKeyRef:
+            name: identity-secrets
+            key: db-connection-string
+    secrets:
+      - name: identity-secrets
+        keys:
+          - db-connection-string
+    migration:
+      enabled: true
+      image:
+        repository: saas-platform/identity
+        tag: migrations-latest
+
+  tenant:
+    enabled: true
+    replicaCount: 1
+    image:
+      repository: saas-platform/tenant
+    service:
+      port: 8080
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+    env:
+      - name: ConnectionStrings__DefaultConnection
+        valueFrom:
+          secretKeyRef:
+            name: tenant-secrets
+            key: db-connection-string
+    secrets:
+      - name: tenant-secrets
+        keys:
+          - db-connection-string
+    migration:
+      enabled: true
+      image:
+        repository: saas-platform/tenant
+        tag: migrations-latest
+
+  order:
+    enabled: true
+    replicaCount: 1
+    image:
+      repository: saas-platform/order
+    service:
+      port: 8080
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+    env:
+      - name: ConnectionStrings__DefaultConnection
+        valueFrom:
+          secretKeyRef:
+            name: order-secrets
+            key: db-connection-string
+    secrets:
+      - name: order-secrets
+        keys:
+          - db-connection-string
+    migration:
+      enabled: true
+      image:
+        repository: saas-platform/order
+        tag: migrations-latest
+
+  payment:
+    enabled: true
+    replicaCount: 1
+    image:
+      repository: saas-platform/payment
+    service:
+      port: 8080
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+    env:
+      - name: ConnectionStrings__DefaultConnection
+        valueFrom:
+          secretKeyRef:
+            name: payment-secrets
+            key: db-connection-string
+      - name: Payment__Provider
+        valueFrom:
+          secretKeyRef:
+            name: payment-secrets
+            key: provider
+      - name: Payment__Stripe__ApiKey
+        valueFrom:
+          secretKeyRef:
+            name: payment-secrets
+            key: stripe-api-key
+    secrets:
+      - name: payment-secrets
+        keys:
+          - db-connection-string
+          - provider
+          - stripe-api-key
+    migration:
+      enabled: true
+      image:
+        repository: saas-platform/payment
+        tag: migrations-latest
+
+  inventory:
+    enabled: true
+    replicaCount: 1
+    image:
+      repository: saas-platform/inventory
+    service:
+      port: 8080
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+    env:
+      - name: ConnectionStrings__DefaultConnection
+        valueFrom:
+          secretKeyRef:
+            name: inventory-secrets
+            key: db-connection-string
+    secrets:
+      - name: inventory-secrets
+        keys:
+          - db-connection-string
+    migration:
+      enabled: true
+      image:
+        repository: saas-platform/inventory
+        tag: migrations-latest
+
+  customer:
+    enabled: true
+    replicaCount: 1
+    image:
+      repository: saas-platform/customer
+    service:
+      port: 8080
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+    env:
+      - name: ConnectionStrings__DefaultConnection
+        valueFrom:
+          secretKeyRef:
+            name: customer-secrets
+            key: db-connection-string
+    secrets:
+      - name: customer-secrets
+        keys:
+          - db-connection-string
+    migration:
+      enabled: true
+      image:
+        repository: saas-platform/customer
+        tag: migrations-latest
+
+  notification:
+    enabled: true
+    replicaCount: 1
+    image:
+      repository: saas-platform/notification
+    service:
+      port: 8080
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+    env:
+      - name: ConnectionStrings__DefaultConnection
+        valueFrom:
+          secretKeyRef:
+            name: notification-secrets
+            key: db-connection-string
+      - name: Notification__Smtp__Host
+        valueFrom:
+          secretKeyRef:
+            name: notification-secrets
+            key: smtp-host
+      - name: Notification__Smtp__Username
+        valueFrom:
+          secretKeyRef:
+            name: notification-secrets
+            key: smtp-username
+      - name: Notification__Smtp__Password
+        valueFrom:
+          secretKeyRef:
+            name: notification-secrets
+            key: smtp-password
+    secrets:
+      - name: notification-secrets
+        keys:
+          - db-connection-string
+          - smtp-host
+          - smtp-username
+          - smtp-password
+    migration:
+      enabled: true
+      image:
+        repository: saas-platform/notification
+        tag: migrations-latest

@@ -1,0 +1,17 @@
+<Project>
+  <PropertyGroup>
+    <!-- Updated to the latest LTS release -->
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!-- Updated to the latest stable C# version (or you can just remove this tag entirely, as net10.0 defaults to C# 14) -->
+    <LangVersion>14.0</LangVersion>
+
+    <Company>SaaSPlatform</Company>
+    <Product>SaaS Microservices Platform</Product>
+    <Version>0.1.0</Version>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);NU1902</NoWarn>
+  </PropertyGroup>
+</Project>

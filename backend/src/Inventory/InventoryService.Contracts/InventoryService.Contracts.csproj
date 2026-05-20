@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>InventoryService.Contracts</AssemblyName>
+    <RootNamespace>InventoryService.Contracts</RootNamespace>
+  </PropertyGroup>
+</Project>

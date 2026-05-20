@@ -1,0 +1,52 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: order-migration
+  namespace: saas-platform
+  labels:
+    app: order
+    component: migration
+spec:
+  template:
+    metadata:
+      labels:
+        app: order
+        component: migration
+    spec:
+      serviceAccountName: order
+      restartPolicy: OnFailure
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: migration
+          image: saas-platform/order:migrations-latest
+          imagePullPolicy: IfNotPresent
+          command: ["dotnet", "ef", "database", "update", "--no-build"]
+          env:
+            - name: ConnectionStrings__DefaultConnection
+              valueFrom:
+                secretKeyRef:
+                  name: order-secrets
+                  key: db-connection-string
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
+  backoffLimit: 3

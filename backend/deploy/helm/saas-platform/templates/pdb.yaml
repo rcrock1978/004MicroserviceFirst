@@ -1,0 +1,15 @@
+{{- range $serviceName, $service := .Values.services }}
+{{- if and $service.enabled $.Values.pdb.enabled }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ $serviceName }}
+  namespace: {{ $.Values.global.namespace }}
+spec:
+  minAvailable: {{ $service.pdb.minAvailable | default $.Values.pdb.minAvailable }}
+  selector:
+    matchLabels:
+      app: {{ $serviceName }}
+{{- end }}
+{{- end }}

@@ -1,0 +1,124 @@
+replicaCount: 3
+
+image:
+  pullPolicy: IfNotPresent
+
+services:
+  gateway:
+    replicaCount: 3
+    resources:
+      requests:
+        cpu: 500m
+        memory: 512Mi
+      limits:
+        cpu: 2000m
+        memory: 1Gi
+    hpa:
+      minReplicas: 3
+      maxReplicas: 20
+  identity:
+    replicaCount: 3
+    resources:
+      requests:
+        cpu: 500m
+        memory: 512Mi
+      limits:
+        cpu: 2000m
+        memory: 1Gi
+    hpa:
+      minReplicas: 3
+      maxReplicas: 20
+  tenant:
+    replicaCount: 3
+    resources:
+      requests:
+        cpu: 500m
+        memory: 512Mi
+      limits:
+        cpu: 2000m
+        memory: 1Gi
+    hpa:
+      minReplicas: 3
+      maxReplicas: 20
+  order:
+    replicaCount: 3
+    resources:
+      requests:
+        cpu: 500m
+        memory: 512Mi
+      limits:
+        cpu: 2000m
+        memory: 1Gi
+    hpa:
+      minReplicas: 3
+      maxReplicas: 20
+  payment:
+    replicaCount: 3
+    resources:
+      requests:
+        cpu: 500m
+        memory: 512Mi
+      limits:
+        cpu: 2000m
+        memory: 1Gi
+    hpa:
+      minReplicas: 3
+      maxReplicas: 20
+  inventory:
+    replicaCount: 3
+    resources:
+      requests:
+        cpu: 500m
+        memory: 512Mi
+      limits:
+        cpu: 2000m
+        memory: 1Gi
+    hpa:
+      minReplicas: 3
+      maxReplicas: 20
+  customer:
+    replicaCount: 3
+    resources:
+      requests:
+        cpu: 500m
+        memory: 512Mi
+      limits:
+        cpu: 2000m
+        memory: 1Gi
+    hpa:
+      minReplicas: 3
+      maxReplicas: 20
+  notification:
+    replicaCount: 3
+    resources:
+      requests:
+        cpu: 500m
+        memory: 512Mi
+      limits:
+        cpu: 2000m
+        memory: 1Gi
+    hpa:
+      minReplicas: 3
+      maxReplicas: 20
+
+pdb:
+  minAvailable: 2
+
+ingress:
+  hosts:
+    - host: api.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: gateway
+              port:
+                number: 8080
+  tls:
+    - secretName: prod-gateway-tls
+      hosts:
+        - api.example.com
+
+global:
+  environment: Production

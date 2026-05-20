@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>CustomerService.Domain</AssemblyName>
+    <RootNamespace>CustomerService.Domain</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Shared\SaaSCommon.Domain\SaaSCommon.Domain.csproj" />
+  </ItemGroup>
+</Project>

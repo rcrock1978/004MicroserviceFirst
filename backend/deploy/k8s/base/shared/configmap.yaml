@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: saas-platform-config
+  namespace: saas-platform
+data:
+  ASPNETCORE_ENVIRONMENT: "Production"
+  DOTNET_gcServer: "1"
+  DOTNET_gcConcurrent: "1"
+  Serilog__MinimumLevel__Default: "Information"
+  Serilog__MinimumLevel__Override__Microsoft: "Warning"
+  Serilog__MinimumLevel__Override__System: "Warning"
+  OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector.monitoring.svc.cluster.local:4317"
+  OTEL_EXPORTER_OTLP_PROTOCOL: "grpc"
+  MassTransit__Transport: "RabbitMQ"
+  MassTransit__Host: "rabbitmq"
+  MassTransit__Port: "5672"
+  Redis__Host: "redis"
+  Redis__Port: "6379"

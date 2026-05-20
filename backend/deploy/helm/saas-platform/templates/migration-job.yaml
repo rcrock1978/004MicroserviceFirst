@@ -1,0 +1,55 @@
+{{- range $serviceName, $service := .Values.services }}
+{{- if and $service.enabled $service.migration.enabled }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ $serviceName }}-migration
+  namespace: {{ $.Values.global.namespace }}
+  labels:
+    app: {{ $serviceName }}
+    component: migration
+spec:
+  template:
+    metadata:
+      labels:
+        app: {{ $serviceName }}
+        component: migration
+    spec:
+      serviceAccountName: {{ $serviceName }}
+      restartPolicy: OnFailure
+      securityContext:
+        {{- toYaml $.Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: migration
+          image: "{{ $service.migration.image.registry | default ($service.image.registry | default $.Values.image.registry) }}/{{ $service.migration.image.repository | default $service.image.repository }}:{{ $service.migration.image.tag | default "migrations-latest" }}"
+          imagePullPolicy: {{ $service.image.pullPolicy | default $.Values.image.pullPolicy }}
+          command: ["dotnet", "ef", "database", "update", "--no-build"]
+          env:
+            {{- range $service.env }}
+            - name: {{ .name }}
+              {{- if .value }}
+              value: {{ .value | quote }}
+              {{- else if .valueFrom }}
+              valueFrom:
+                {{- toYaml .valueFrom | nindent 16 }}
+              {{- end }}
+            {{- end }}
+          securityContext:
+            {{- toYaml $.Values.securityContext | nindent 12 }}
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
+  backoffLimit: 3
+{{- end }}
+{{- end }}

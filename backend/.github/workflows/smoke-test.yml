@@ -1,0 +1,84 @@
+name: Smoke Tests
+
+on:
+  workflow_run:
+    workflows: ["Deploy"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to test'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+jobs:
+  smoke-tests:
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.29.0'
+
+      - name: Setup Kustomize
+        uses: imranismail/setup-kustomize@v2
+        with:
+          kustomize-version: '5.3.0'
+
+      - name: Configure kubeconfig
+        run: |
+          echo "${{ secrets.KUBECONFIG }}" | base64 -d > kubeconfig
+          export KUBECONFIG=kubeconfig
+
+      - name: Deploy to ephemeral namespace
+        run: |
+          export KUBECONFIG=kubeconfig
+          EPHEMERAL_NS="saas-platform-smoke-${{ github.run_id }}"
+          kubectl create namespace $EPHEMERAL_NS || true
+          kustomize build deploy/k8s/overlays/dev | \
+            sed "s/namespace: saas-platform-dev/namespace: $EPHEMERAL_NS/" | \
+            kubectl apply -f -
+          echo "EPHEMERAL_NS=$EPHEMERAL_NS" >> $GITHUB_ENV
+
+      - name: Wait for deployments
+        run: |
+          export KUBECONFIG=kubeconfig
+          for deploy in gateway identity tenant order payment inventory customer notification; do
+            kubectl rollout status deployment/$deploy -n $EPHEMERAL_NS --timeout=300s
+          done
+
+      - name: Port-forward Gateway and run smoke tests
+        run: |
+          export KUBECONFIG=kubeconfig
+          nohup kubectl port-forward svc/gateway 8080:8080 -n $EPHEMERAL_NS > /dev/null 2>&1 &
+          sleep 5
+          dotnet test tests/SmokeTests/SmokeTests.csproj --configuration Release --logger trx || true
+        env:
+          GATEWAY_BASE_URL: http://localhost:8080
+
+      - name: Upload smoke test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: smoke-test-results
+          path: '**/*.trx'
+
+      - name: Tear down ephemeral namespace
+        if: always()
+        run: |
+          export KUBECONFIG=kubeconfig
+          kubectl delete namespace $EPHEMERAL_NS --ignore-not-found=true --wait=false
